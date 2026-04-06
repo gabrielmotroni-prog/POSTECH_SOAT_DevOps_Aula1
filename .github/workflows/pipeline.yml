@@ -1,4 +1,4 @@
-name: minha-pipeline
+name: pipeline
 
 on:
   push: # aciona pipepine a cada commit 
