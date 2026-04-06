@@ -4,13 +4,13 @@ on:
   push: # aciona pipepine a cada commit 
 
 jobs:
-  unit-test: # job que roda testes
+  unit-test: # 1) job que roda testes
     runs-on: ubuntu-latest # vau rodar em runner em ubuntu
 
     steps:
     - uses: actions/checkout@v3 # etapa: copia o codigo
       with:
-        fetch-depth: 0
+        fetch-depth: 
         
     - run: mvn test  
     
@@ -28,7 +28,7 @@ jobs:
         name: jacoco-report
         path: target/site/jacoco/
         
-  code-analisys: # job analise de codigo
+  code-analisys: # 2) job analise de codigo
     runs-on: ubuntu-latest # vai rodar em runner ubuntu
     needs: unit-test
     
@@ -54,8 +54,7 @@ jobs:
 
       run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Devops-Fiap
     
-    
-  build: # job build
+  build: # 3) job build
     name: Build Archive
     runs-on: ubuntu-latest 
     needs: unit-test # necessario ter concluido job de teste antes
@@ -78,47 +77,46 @@ jobs:
         #From this path
         path: ./target/demo-0.0.2.7-SNAPSHOT.jar 
           
-  # deploy-STG:
-  #   runs-on: ubuntu-latest
-  #   environment:
-  #     name: stg
-  #   needs: build
+  deploy-STG: # 4) job deploy staging
+    runs-on: ubuntu-latest
+    environment:
+      name: stg
+    needs: build
     
-  #   if: github.ref == 'refs/heads/develop'
-  #   steps:
-  #     - name: Deploy 
-  #       shell: bash
-  #       run: |
-  #         echo "Deploy STG"
+    if: github.ref == 'refs/heads/develop' # só roda esse deploy em brach de develop
+    steps:
+      - name: Deploy 
+        shell: bash
+        run: |
+          echo "Deploy STG"
+            
+  deploy-Pre: # 5) job deploy release
+    runs-on: ubuntu-latest
+
+    if: github.ref == 'refs/heads/release' # só roda esse deploy em brach de release
+    environment:
+      name: pre
+    needs: build
+
+    steps:
+      - name: Deploy 
+        shell: bash
+        run: |
+          echo "Deploy PRE"
           
-    
-  # deploy-Pre:
-  #   runs-on: ubuntu-latest
+  deploy-Prod: # 6) job deploy prod
+    runs-on: ubuntu-latest
 
-  #   if: github.ref == 'refs/heads/release'
-  #   environment:
-  #     name: pre
-  #   needs: build
+    if: github.ref == 'refs/heads/main' # só roda esse deploy em brach de main
+    environment:
+      name: prod
+    needs: build
 
-  #   steps:
-  #     - name: Deploy 
-  #       shell: bash
-  #       run: |
-  #         echo "Deploy PRE"
-          
-  # deploy-Prod:
-  #   runs-on: ubuntu-latest
-
-  #   if: github.ref == 'refs/heads/main'
-  #   environment:
-  #     name: prod
-  #   needs: build
-
-  #   steps:
-  #     - name: Deploy 
-  #       shell: bash
-  #       run: |
-  #         echo "Deploy PROD"       
+    steps:
+      - name: Deploy 
+        shell: bash
+        run: |
+          echo "Deploy PROD"       
           
   # deploy-azure:
   #   needs: build  
