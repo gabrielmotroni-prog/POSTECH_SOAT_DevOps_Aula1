@@ -28,7 +28,7 @@ jobs:
         name: jacoco-report
         path: target/site/jacoco/
 
- #        
+        
   # code-analisys: # 2) job analise de codigo
   #   runs-on: ubuntu-latest # vai rodar em runner ubuntu
   #   needs: unit-test
@@ -53,7 +53,7 @@ jobs:
   #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
   #       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Devops-Fiap
+  #     run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Devops-Fiap
     
   build: # 3) job build
     name: Build Archive
